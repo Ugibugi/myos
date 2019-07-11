@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include "icxxabi.h"
-#include "vga_term.h"
 
 #ifdef __cplusplus
 extern "C" {

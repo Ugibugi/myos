@@ -1,28 +1,12 @@
-#include "vga_term.h"
+#include "console.h"
 
 //Class to test cpp enviorment
-class Term_t
-{
-public:
-		Term_t()
-		{
-			terminal_initialize();
-			terminal_writestring("Term constructed!\n");
-		}
-		~Term_t()
-		{
-			terminal_writestring("Term Destructed!\n");
-		}
-		write(const char* str)
-		{
-			terminal_writestring(str);
-		}
-
-}Console;
+Console cout;
 
 
 extern "C" void kernel_main(void)
 {
-  Console.write("Setting up C++ runtime enviorment\n");
-	Console.write("Main running\n");
+	int test_value = 0xBAADF00D;
+  cout << "Testing C+ style console\n";
+	cout << ioflags::fgcolor::lightred << "Wartosc zmiennej: " << ioflags::fgcolor::green <<test_value << ioflags::fgcolor::white << "\n";
 }
