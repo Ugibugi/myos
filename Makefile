@@ -4,7 +4,7 @@ ASMFLAGS = -felf32
 CFLAGS=-ffreestanding -std=c++17 -Wall -Wextra -O2 -fno-exceptions -fno-rtti
 CEXTRA_FLAGS = -nostdlib -lgcc
 BUILD_DIR = build
-OBJ_DIR = $(BUILD_DIR)/obj
+OBJ_DIR = $(BUILD_DIR)
 SRC_DIR = src
 DEP_DIR = $(SRC_DIR)
 LD_SCRIPT = linker.ld
