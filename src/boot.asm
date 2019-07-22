@@ -14,19 +14,48 @@ align 4
 section .bbs
 align 16
 stack_bottom:
-resb 16384 ; 16KiB
+resb 16384 ; 16KB
 stack_top:
 
 
+;quick copy-paste simple gdt for now (or forever)
+section .data
+gdt:
+  gdt_null:
+  dq 0
+
+  gdt_code:
+  dw 0FFFFh
+  dw 0
+
+  db 0
+  db 10011010b
+  db 11001111b
+  db 0
+
+  gdt_data:
+  dw 0FFFFh
+  dw 0
+
+  db 0
+  db 10010010b
+  db 11001111b
+  db 0
+
+  gdt_end:
+
+  gdt_desc:
+   dw gdt_end - gdt - 1
+   dd gdt
 
 section .text
 global _start:function (_start.end - _start)
 _start:
+	cli
+	lgdt [gdt_desc]
+	sti
 
 	mov esp, stack_top
-	;experimental
-  ;extern terminal_initialize
-	;call terimnal_initialize
 
 	extern _init
 	call _init
