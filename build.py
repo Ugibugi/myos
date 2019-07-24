@@ -32,9 +32,10 @@ src_dir = "src"
 #dirs defined specificly for the project
 klib_dir = join(src_dir,"klib")
 cppabi_dir = join(src_dir,"cxxabi")
+hardwr_dir = join(src_dir,"HAL")
 
 #dirs to pass to compiler as include paths
-incl_dirs = [src_dir, klib_dir, cppabi_dir]
+incl_dirs = [src_dir, klib_dir, cppabi_dir,hardwr_dir]
 
 cppflags = ["-ffreestanding", "-std=c++17", "-Wall", "-Wextra", "-O2", "-fno-exceptions", "-fno-rtti"]+["-I "+f for f in incl_dirs]
 asmflags = ["-felf32"]
@@ -44,15 +45,18 @@ def compileAllSourcesIn(dir,ext,flags):
         fname, ext = splitext(file)
         outfile = join(out_dir, fname+".o")
         infile = join(dir, file)
-        if getmtime(outfile) < getmtime(infile):
-            compile_cmds[ext](infile,outfile,flags)
+        if isfile(outfile):
+            if getmtime(outfile) < getmtime(infile):
+                compile_cmds[ext](infile,outfile,flags)
+            else:
+                print(infile+" unchanged, ommiting...")
         else:
-            print(infile+" unchanged, ommiting...")
+            compile_cmds[ext](infile,outfile,flags)
 
 
 
 
-
+#compile process
 def compile():
     crtbegin_file = subprocess.run([CC]+cppflags+["-print-file-name=crtbegin.o"], stdout = subprocess.PIPE).stdout
     crtend_file =   subprocess.run([CC]+cppflags+["-print-file-name=crtend.o"], stdout = subprocess.PIPE).stdout
@@ -62,6 +66,9 @@ def compile():
     compileAllSourcesIn(cppabi_dir,".cpp",cppflags+[" -c"])
     compileAllSourcesIn(cppabi_dir,".c",cppflags+[" -c"])
     compileAllSourcesIn(cppabi_dir,".asm",asmflags)
+
+    compileAllSourcesIn(hardwr_dir,".cpp",cppflags+["-c"])
+    compileAllSourcesIn(hardwr_dir,".asm",asmflags)
 
     compileAllSourcesIn(src_dir,".cpp",cppflags+[" -c"])
     compileAllSourcesIn(src_dir,".asm",asmflags)
@@ -73,8 +80,8 @@ def compile():
 
     exclude = ["crti.o", "crtn.o"]
     link_list = [join(out_dir, f) for f in allSourcesIn(out_dir, ".o") if f not in exclude]
-    print(" ".join([CC]+["-o myos.bin","-T linker.ld","-nostdlib", "-lgcc"]+begin_files+link_list+end_files))
-    system(" ".join([CC]+["-o myos.bin","-T linker.ld","-nostdlib", "-lgcc"]+begin_files+link_list+end_files))
+    print(" ".join([CC]+["-o myos.bin","-T linker.ld","-nostdlib", "-lgcc"]+begin_files+link_list+end_files+cppflags))
+    system(" ".join([CC]+["-o myos.bin","-T linker.ld","-nostdlib", "-lgcc"]+begin_files+link_list+end_files+cppflags))
 
 if __name__ == '__main__':
     compile()

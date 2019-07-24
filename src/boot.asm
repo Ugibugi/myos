@@ -49,14 +49,25 @@ gdt:
    dd gdt
 
 section .text
-global _start:function (_start.end - _start)
+global _start:function (fix_cs.end - _start)
 _start:
 	cli
 	lgdt [gdt_desc]
-	sti
-
+	jmp 0x0008:fix_cs
+	
+	fix_cs:
+	mov ax, 0x0010
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	mov ss, ax
 	mov esp, stack_top
-
+	
+	extern setupIDT
+	call setupIDT
+	
+	
 	extern _init
 	call _init
 

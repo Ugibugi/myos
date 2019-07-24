@@ -101,5 +101,4 @@ Console& operator<<(Console& c,uint16_t num);
 Console& operator<<(Console& c,uint32_t num);
 Console& operator<<(Console& c,uint64_t num);
 Console& operator<<(Console& c,int num);
-
 #endif
